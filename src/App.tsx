@@ -1,4 +1,4 @@
-import { Background, Controls, ReactFlow } from '@xyflow/react';
+import { Background, Controls, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 const initialNodes = [
@@ -17,9 +17,30 @@ const initialNodes = [
 const initialEdges = [{ id: 'e1-2', source: '1', target: '2', label: '巨大感情', animated: true }];
 
 function App() {
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const addNode = () => {
+    const newNode = {
+      id: Date.now().toString(),
+      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      data: { label: '新キャラ' },
+    };
+    setNodes((nds) => [...nds, newNode]);
+  };
+
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
-      <ReactFlow defaultNodes={initialNodes} defaultEdges={initialEdges} fitView>
+      <button onClick={addNode} style={{ position: 'absolute', zIndex: 10, margin: 10 }}>
+        キャラ追加
+      </button>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        fitView
+      >
         <Background />
         <Controls />
       </ReactFlow>
