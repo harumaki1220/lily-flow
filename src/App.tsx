@@ -9,17 +9,30 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useCallback } from 'react';
+import { ImageNode } from './components/ImageNode';
+
+const nodeTypes = {
+  'image-node': ImageNode,
+};
 
 const initialNodes = [
   {
     id: '1',
+    type: 'image-node',
     position: { x: 100, y: 100 },
-    data: { label: '主人公' },
+    data: {
+      label: '主人公',
+      image: 'https://placehold.co/100x100/pink/white?text=Top',
+    },
   },
   {
     id: '2',
+    type: 'image-node',
     position: { x: 400, y: 100 },
-    data: { label: 'ヒロイン' },
+    data: {
+      label: 'ヒロイン',
+      image: 'https://placehold.co/100x100/skyblue/white?text=Bottom',
+    },
   },
 ];
 
@@ -32,8 +45,12 @@ function App() {
   const addNode = () => {
     const newNode = {
       id: Date.now().toString(),
+      type: 'image-node',
       position: { x: Math.random() * 400, y: Math.random() * 400 },
-      data: { label: '新キャラ' },
+      data: {
+        label: '新キャラ',
+        image: 'https://placehold.co/100x100/gray/white?text=New',
+      },
     };
     setNodes((nds) => [...nds, newNode]);
   };
@@ -53,6 +70,7 @@ function App() {
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
