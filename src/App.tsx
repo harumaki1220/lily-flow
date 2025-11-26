@@ -57,7 +57,9 @@ function App() {
 
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges((eds) => addEdge(params, eds));
+      const label = window.prompt('関係性を入力してください');
+      if (label === null) return;
+      setEdges((eds) => addEdge({ ...params, label, animated: true }, eds));
     },
     [setEdges]
   );
