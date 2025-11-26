@@ -6,6 +6,7 @@ import {
   useEdgesState,
   useNodesState,
   type Connection,
+  type Edge,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { toPng } from 'html-to-image';
@@ -37,14 +38,17 @@ const initialNodes = [
   },
 ];
 
-const initialEdges = [
+const initialEdges: Edge[] = [
   {
     id: 'e1-2',
     source: '1',
     target: '2',
     label: '巨大感情',
     animated: true,
-    labelBgStyle: { fill: '#ffffff' },
+    labelBgStyle: { fill: '#ffffff', fillOpacity: 1 },
+    labelBgPadding: [2, 4],
+    labelBgBorderRadius: 4,
+    style: { stroke: '#555555', strokeWidth: 2 },
   },
 ];
 
@@ -71,9 +75,23 @@ function App() {
     (params: Connection) => {
       const label = window.prompt('関係性を入力してください');
       if (label === null) return;
-      setEdges((eds) =>
-        addEdge({ ...params, label, animated: true, labelBgStyle: { fill: '#ffffff' } }, eds)
-      );
+      setEdges((eds) => {
+        const newEdges = addEdge(params, eds);
+        return newEdges.map((edge) => {
+          if (edge.source === params.source && edge.target === params.target) {
+            return {
+              ...edge,
+              label,
+              animated: true,
+              labelBgStyle: { fill: '#ffffff', fillOpacity: 1 },
+              labelBgPadding: [2, 4],
+              labelBgBorderRadius: 4,
+              style: { stroke: '#555555', strokeWidth: 2 },
+            };
+          }
+          return edge;
+        });
+      });
     },
     [setEdges]
   );
