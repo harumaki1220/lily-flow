@@ -8,7 +8,8 @@ import {
   type Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useCallback } from 'react';
+import { toPng } from 'html-to-image';
+import { useCallback, useRef } from 'react';
 import { ImageNode } from './components/ImageNode';
 
 const nodeTypes = {
@@ -36,11 +37,22 @@ const initialNodes = [
   },
 ];
 
-const initialEdges = [{ id: 'e1-2', source: '1', target: '2', label: '巨大感情', animated: true }];
+const initialEdges = [
+  {
+    id: 'e1-2',
+    source: '1',
+    target: '2',
+    label: '巨大感情',
+    animated: true,
+    labelBgStyle: { fill: '#ffffff' },
+  },
+];
 
 function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const ref = useRef<HTMLDivElement>(null);
 
   const addNode = () => {
     const newNode = {
@@ -59,15 +71,48 @@ function App() {
     (params: Connection) => {
       const label = window.prompt('関係性を入力してください');
       if (label === null) return;
-      setEdges((eds) => addEdge({ ...params, label, animated: true }, eds));
+      setEdges((eds) =>
+        addEdge({ ...params, label, animated: true, labelBgStyle: { fill: '#ffffff' } }, eds)
+      );
     },
     [setEdges]
   );
 
+  const onDownload = useCallback(() => {
+    if (ref.current === null) return;
+
+    toPng(ref.current, {
+      cacheBust: true,
+      backgroundColor: '#ffffff',
+      fontEmbedCSS: '',
+      filter: (node) => {
+        if (node.tagName === 'BUTTON') {
+          return false;
+        }
+        return true;
+      },
+    })
+      .then((dataURL) => {
+        const link = document.createElement('a');
+        link.download = 'lily-flow.png';
+        link.href = dataURL;
+        link.click();
+      })
+      .catch((err) => {
+        console.error('保存に失敗しました', err);
+      });
+  }, [ref]);
+
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100vw', height: '100vh' }} ref={ref}>
       <button onClick={addNode} style={{ position: 'absolute', zIndex: 10, margin: 10 }}>
         キャラ追加
+      </button>
+      <button
+        onClick={onDownload}
+        style={{ position: 'absolute', zIndex: 10, top: 10, right: 10, margin: 10 }}
+      >
+        画像保存
       </button>
       <ReactFlow
         nodes={nodes}
