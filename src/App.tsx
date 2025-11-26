@@ -1,5 +1,14 @@
-import { Background, Controls, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react';
+import {
+  addEdge,
+  Background,
+  Controls,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
+  type Connection,
+} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useCallback } from 'react';
 
 const initialNodes = [
   {
@@ -29,6 +38,13 @@ function App() {
     setNodes((nds) => [...nds, newNode]);
   };
 
+  const onConnect = useCallback(
+    (params: Connection) => {
+      setEdges((eds) => addEdge(params, eds));
+    },
+    [setEdges]
+  );
+
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <button onClick={addNode} style={{ position: 'absolute', zIndex: 10, margin: 10 }}>
@@ -39,6 +55,7 @@ function App() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
         fitView
       >
         <Background />
