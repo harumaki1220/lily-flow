@@ -121,6 +121,22 @@ function App() {
       });
   }, [ref]);
 
+  const onEdgeDoubleClick = useCallback(
+    (event: React.MouseEvent, edge: Edge) => {
+      const newLabel = window.prompt('関係性を変更します', edge.label as string);
+      if (newLabel === null) return;
+      setEdges((eds) =>
+        eds.map((e) => {
+          if (e.id === edge.id) {
+            return { ...e, label: newLabel };
+          }
+          return e;
+        })
+      );
+    },
+    [setEdges]
+  );
+
   return (
     <div style={{ width: '100vw', height: '100vh' }} ref={ref}>
       <button onClick={addNode} style={{ position: 'absolute', zIndex: 10, margin: 10 }}>
@@ -139,6 +155,7 @@ function App() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onEdgeDoubleClick={onEdgeDoubleClick}
         fitView
       >
         <Background />
